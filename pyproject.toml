@@ -8,6 +8,8 @@ dependencies = [
     "torch>=2.2.0",
     "torchvision",
     "sentence-transformers>=2.5.0",
+    "datasets>=2.18.0",  # Added for Hugging Face data
+    "accelerate",        # Added for HF optimization
     "numpy",
     "tqdm",
 ]
