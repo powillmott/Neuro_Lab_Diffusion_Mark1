@@ -34,6 +34,8 @@ class MathVAE(nn.Module):
         with torch.no_grad():
             # Get 384-dim embeddings from SentenceTransformer
             embeddings = self.embedding_model.encode(sentences, convert_to_tensor=True)
+            # Move to the correct device and "unfreeze" from inference mode
+            embeddings = embeddings.detach().clone().to(next(self.parameters()).device)
         
         h = self.encoder(embeddings)
         return self.fc_mu(h), self.fc_logvar(h)

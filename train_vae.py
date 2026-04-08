@@ -1,9 +1,14 @@
 import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader, Dataset
-from vae import MathVAE, vae_loss
 
-# 1. Simple Dataset to handle math sentences
+# Importing from your subfolders
+from data.data_utils import get_math_reasoning_data
+from models.vae import MathVAE, vae_loss
+
+# Optimized for L40S
+torch.set_float32_matmul_precision('high')
+
 class MathTextDataset(Dataset):
     def __init__(self, sentences):
         self.sentences = sentences
@@ -17,22 +22,24 @@ class MathTextDataset(Dataset):
 def train():
     # --- Hyperparameters ---
     latent_dim = 128
-    batch_size = 32
+    batch_size = 128  # Increased for L40S memory
     epochs = 20
     learning_rate = 1e-4
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # --- Dummy Data (Replace with your math corpus later) ---
-    math_data = [
-        "Let x be equal to five.",
-        "Add three to both sides of the equation.",
-        "The derivative of x squared is two x.",
-        "Simplify the expression by grouping terms.",
-        "Solve for the variable y."
-    ] * 100 # Artificial inflation for testing
+    # --- Real Data from Hugging Face ---
+    # Using the function in your data/data_utils.py
+    math_data = get_math_reasoning_data(dataset_name="gsm8k")
     
     dataset = MathTextDataset(math_data)
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    # Optimized DataLoader for server hardware
+    dataloader = DataLoader(
+        dataset, 
+        batch_size=batch_size, 
+        shuffle=True, 
+        num_workers=4, 
+        pin_memory=True
+    )
 
     # --- Initialize Model ---
     model = MathVAE(latent_dim=latent_dim).to(device)
@@ -50,12 +57,12 @@ def train():
             with torch.no_grad():
                 target_embeddings = model.embedding_model.encode(
                     batch_sentences, convert_to_tensor=True
-                ).to(device)
+                ).detach().clone().to(device)
 
             # 2. Forward pass through VAE
             recon_batch, mu, logvar = model(batch_sentences)
 
-            # 3. Calculate Loss
+            # 3. Calculate Loss (using beta=0.1 for a smoother manifold)
             loss = vae_loss(recon_batch, target_embeddings, mu, logvar, beta=0.1)
             
             # 4. Backprop
