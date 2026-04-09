@@ -1,10 +1,10 @@
 import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from vae import MathVAE
-from dit_1d import DiT1D
-from diffusion import DiffusionEngine
-from dataset import LatentStepDataset, collate_fn
+from models.vae import MathVAE
+from models.dit_1d import DiT1D
+from models.diffusion import DiffusionEngine
+from data.dataset import LatentStepDataset, collate_fn
 
 def train():
     # --- Configuration ---

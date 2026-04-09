@@ -1,0 +1,18 @@
+nohup: ignoring input
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 11696.90it/s]
+[1mBertModel LOAD REPORT[0m from: sentence-transformers/all-MiniLM-L6-v2
+Key                     | Status     |  | 
+------------------------+------------+--+-
+embeddings.position_ids | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+Loaded VAE weights successfully.
+Traceback (most recent call last):
+  File "/yunity/pwillmot/Neuro_Lab_Diffusion_Mark1/train_diffusion.py", line 81, in <module>
+    train()
+  File "/yunity/pwillmot/Neuro_Lab_Diffusion_Mark1/train_diffusion.py", line 31, in train
+    dataset = LatentStepDataset(vae=vae, max_steps=max_steps, device=device)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: LatentStepDataset.__init__() missing 1 required positional argument: 'paragraphs'

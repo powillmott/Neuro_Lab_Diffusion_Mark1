@@ -1,0 +1,6 @@
+# Ignore model artifacts synced to Hugging Face bucket
+weights/
+
+# Python bytecode caches
+__pycache__/
+*.py[cod]
