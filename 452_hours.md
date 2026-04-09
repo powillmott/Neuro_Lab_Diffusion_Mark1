@@ -23,6 +23,15 @@ Date:          Hours:          What:
 
 4/8:           1               Successfully trained a first iteration of the diffusion model MSE loss went down very low, but it not able to do everything I want the model to be able to do yet, nor is the output fit to nodes for the system yet, but it is a really exciting to see it train successfully.
 
+4/9:           1               Figured out the workflow between how I want the dbl and deep learning parts to work and interact with the user (conceptually)
 
+4/9:           1               Got hugging face bucket set up to store the model weights
 
+4/9:           1               query engineering for generated problems
+
+4/9:           1               building next langgraph setup for dbl traversal in conversation state
+
+4/9:           1               getting streamlit up, and working on memory for chat and routing and traversal of the graph structure
+
+4/9:           1               Got my langgraphs and neo4j working together, and I can now talk my ai through the tree! And the problem generation is working super super well, overall great checkpoint.
 
