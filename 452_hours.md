@@ -37,5 +37,5 @@ Date:          Hours:          What:
 
 4/11:          5               Got supabase set up, worked on switching from local chat memory to persistance, users added, supabase edge function for create user so user is created in neo4j for connection to models
 
-
+4/11:          3               God supabase authentication and users working, and got creation of new dbl practice problems working within users in interface
 
