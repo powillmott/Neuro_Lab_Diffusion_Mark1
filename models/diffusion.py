@@ -28,9 +28,10 @@ class DiffusionEngine:
         self.sqrt_one_minus_alphas_cumprod = torch.sqrt(1. - self.alphas_cumprod)
 
     def add_noise(self, x_start, t):
-        # Forward Process (same logic, now with cosine-derived values)
-        sqrt_alphas_cumprod_t = self.sqrt_alphas_cumprod[t].view(-1, 1, 1)
-        sqrt_one_minus_alphas_cumprod_t = self.sqrt_one_minus_alphas_cumprod[t].view(-1, 1, 1)
+        # x_start is (B, 128)
+        # We need to reshape the coefficients to (B, 1) to multiply correctly
+        sqrt_alphas_cumprod_t = self.sqrt_alphas_cumprod[t].view(-1, 1)
+        sqrt_one_minus_alphas_cumprod_t = self.sqrt_one_minus_alphas_cumprod[t].view(-1, 1)
         
         noise = torch.randn_like(x_start)
         x_noisy = sqrt_alphas_cumprod_t * x_start + sqrt_one_minus_alphas_cumprod_t * noise

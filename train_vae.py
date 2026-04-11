@@ -23,13 +23,13 @@ def train():
     # --- Hyperparameters ---
     latent_dim = 128
     batch_size = 128  # Increased for L40S memory
-    epochs = 20
+    epochs = 30
     learning_rate = 1e-4
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # --- Real Data from Hugging Face ---
     # Using the function in your data/data_utils.py
-    math_data = get_math_reasoning_data(dataset_name="gsm8k")
+    math_data = get_math_reasoning_data(dataset_name="EleutherAI/hendrycks_math")
     
     dataset = MathTextDataset(math_data)
     # Optimized DataLoader for server hardware
@@ -45,6 +45,7 @@ def train():
     model = MathVAE(latent_dim=latent_dim).to(device)
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
+    print(f"Training on {len(math_data)} high-school level math steps.")
     print(f"Starting VAE training on {device}...")
 
     model.train()
