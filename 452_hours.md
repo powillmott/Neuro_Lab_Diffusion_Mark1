@@ -35,3 +35,7 @@ Date:          Hours:          What:
 
 4/9:           1               Got my langgraphs and neo4j working together, and I can now talk my ai through the tree! And the problem generation is working super super well, overall great checkpoint.
 
+4/11:          5               Got supabase set up, worked on switching from local chat memory to persistance, users added, supabase edge function for create user so user is created in neo4j for connection to models
+
+
+
