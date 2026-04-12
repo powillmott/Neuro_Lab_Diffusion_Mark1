@@ -39,3 +39,4 @@ Date:          Hours:          What:
 
 4/11:          3               God supabase authentication and users working, and got creation of new dbl practice problems working within users in interface
 
+4/11           1               Got deleting chats to cascade through the database, and got chat history to work with langgraph checkpoints, really good
