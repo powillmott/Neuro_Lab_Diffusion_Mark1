@@ -5,10 +5,10 @@ ERD diagram for Supabase
 View of most of the graph database
 <img width="554" height="465" alt="image" src="https://github.com/user-attachments/assets/0b6a0a2b-5f5c-4899-8dfc-687f8168870e" />
 
-Video Demo:
+Video Demo (Part 1 and 2 split for file size):
+https://github.com/user-attachments/assets/f46c57df-134d-42a2-861f-41cced3f68b7
 
-
-
+https://github.com/user-attachments/assets/e27e3e1c-352c-4e68-a43d-96979e626954
 
 I learned a ton about creating a full stack application, first time really doing that, with users and authentication and data storage from scratch. I specifically learned a lot from using supabase, that was great learning the ways it works with authentication, and how to work with it to keep data consistent. Neo4j was a really fun part of the project as well, and there was one specific hard challenge getting users in it to match supabase, but some really cool supabase functions that creates a user in neo4j when it is created in supabase worked really well. Also, langchain and automatically created database tables. Still learning here, but it was cool to learn to have to work with others design choices. I had some early disconnect between some of my tables and the uses of theirs, redundency that I was able to trim down on as I learned.
 
