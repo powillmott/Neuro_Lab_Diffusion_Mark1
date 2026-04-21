@@ -1,10 +1,11 @@
 import torch
 import torch.optim as optim
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, random_split
 
 # Importing from your subfolders
 from data.data_utils import get_math_reasoning_data
 from models.vae import MathVAE, vae_loss
+import math
 
 # Optimized for L40S
 torch.set_float32_matmul_precision('high')
@@ -28,56 +29,52 @@ def train():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # --- Real Data from Hugging Face ---
-    # Using the function in your data/data_utils.py
-    math_data = get_math_reasoning_data(dataset_name="EleutherAI/hendrycks_math")
-    
-    dataset = MathTextDataset(math_data)
-    # Optimized DataLoader for server hardware
-    dataloader = DataLoader(
-        dataset, 
-        batch_size=batch_size, 
-        shuffle=True, 
-        num_workers=4, 
-        pin_memory=True
-    )
+    train_steps, val_steps = get_math_reasoning_data()
+
+    train_ds = MathTextDataset(train_steps)
+    val_ds = MathTextDataset(val_steps)
+
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, pin_memory=True)
+    val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False, pin_memory=True)
 
     # --- Initialize Model ---
     model = MathVAE(latent_dim=latent_dim).to(device)
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-    print(f"Training on {len(math_data)} high-school level math steps.")
-    print(f"Starting VAE training on {device}...")
+    print(f"Training on {len(train_ds)} steps, Validating on {len(val_ds)} steps.")
 
-    model.train()
     for epoch in range(epochs):
-        total_loss = 0
-        for batch_sentences in dataloader:
+        model.train()
+        train_loss = 0
+        for batch_sentences in train_loader:
             optimizer.zero_grad()
-
-            # 1. Get the "ground truth" BERT embeddings
-            with torch.no_grad():
-                target_embeddings = model.embedding_model.encode(
-                    batch_sentences, convert_to_tensor=True
-                ).detach().clone().to(device)
-
-            # 2. Forward pass through VAE
-            recon_batch, mu, logvar = model(batch_sentences)
-
-            # 3. Calculate Loss (using beta=0.1 for a smoother manifold)
-            loss = vae_loss(recon_batch, target_embeddings, mu, logvar, beta=0.1)
             
-            # 4. Backprop
+            # Ground truth from SentenceTransformer
+            with torch.no_grad():
+                target = model.embedding_model.encode(batch_sentences, convert_to_tensor=True).detach().clone().to(device)
+
+            recon_batch, mu, logvar = model(batch_sentences)
+            loss = vae_loss(recon_batch, target, mu, logvar, beta=0.1)
+            
             loss.backward()
             optimizer.step()
-            
-            total_loss += loss.item()
+            train_loss += loss.item()
 
-        avg_loss = total_loss / len(dataloader)
-        print(f"Epoch [{epoch+1}/{epochs}] - Loss: {avg_loss:.6f}")
+        # Validation Step
+        model.eval()
+        val_mse_sum = 0
+        with torch.no_grad():
+            for batch_sentences in val_loader:
+                target = model.embedding_model.encode(batch_sentences, convert_to_tensor=True).detach().clone().to(device)
+                recon_batch, mu, logvar = model(batch_sentences)
+                val_mse_sum += vae_loss(recon_batch, target, mu, logvar, beta=0.1).item()
+        val_rmse = math.sqrt(val_mse_sum / len(val_loader))
+        train_rmse = math.sqrt(train_loss / len(train_loader))
 
-    # --- Save the Weights ---
-    torch.save(model.state_dict(), "vae_weights.pt")
-    print("Training complete. Weights saved to vae_weights.pt")
+        print(f"Epoch {epoch+1} | Train RMSE: {train_rmse:.4f} | Val RMSE: {val_rmse:.4f}")
+
+    torch.save(model.state_dict(), "weights/vae_highschool_weights.pt")
+    print("Training complete. Weights saved.")
 
 if __name__ == "__main__":
     train()

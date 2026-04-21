@@ -2,6 +2,7 @@ import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader, random_split
 import math
+from pathlib import Path
 from models.vae import MathVAE
 from models.bridge_dit import BridgeDiT  # Use the new model
 from models.diffusion import DiffusionEngine
@@ -13,6 +14,8 @@ def train():
     batch_size = 128
     epochs = 50
     lr = 1e-4
+    weights_dir = Path(__file__).resolve().parent / "weights"
+    weights_dir.mkdir(parents=True, exist_ok=True)
 
     # 1. VAE
     vae = MathVAE(latent_dim=latent_dim).to(device)
@@ -69,6 +72,16 @@ def train():
         val_rmse = math.sqrt(val_mse_sum / len(val_loader))
 
         print(f"Epoch {epoch+1} | Train RMSE: {train_rmse:.4f} | Val RMSE: {val_rmse:.4f}")
+
+        # Save checkpoint every 10 epochs (overwrites existing file names in weights/)
+        if (epoch + 1) % 10 == 0:
+            checkpoint_path = weights_dir / f"bridge_dit_ep{epoch+1}.pt"
+            torch.save(model.state_dict(), checkpoint_path)
+            print(f"Saved checkpoint: {checkpoint_path}")
+
+    final_path = weights_dir / "bridge_dit_final.pt"
+    torch.save(model.state_dict(), final_path)
+    print(f"Training complete. Weights saved to {final_path}")
 
 if __name__ == "__main__":
     train()
