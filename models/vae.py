@@ -3,7 +3,7 @@ import torch.nn as nn
 from sentence_transformers import SentenceTransformer
 
 class MathVAE(nn.Module):
-    def __init__(self, latent_dim=128, model_name='all-MiniLM-L6-v2'):
+    def __init__(self, latent_dim=128, model_name='BAAI/bge-small-en-v1.5'):
         super(MathVAE, self).__init__()
         
         # 1. The Language Backbone (Frozen for simplicity)
@@ -17,9 +17,10 @@ class MathVAE(nn.Module):
             nn.Linear(512, 256),
             nn.ReLU()
         )
+
         self.fc_mu = nn.Linear(256, latent_dim)
         self.fc_logvar = nn.Linear(256, latent_dim)
-        
+
         # 3. Decoder: Reconstructs the original sentence embedding
         self.decoder = nn.Sequential(
             nn.Linear(latent_dim, 256),

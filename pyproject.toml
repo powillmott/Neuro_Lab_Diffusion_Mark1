@@ -12,6 +12,7 @@ dependencies = [
     "accelerate",        # Added for HF optimization
     "numpy",
     "tqdm",
+    "matplotlib>=3.10.8",
 ]
 
 [[tool.uv.index]]
